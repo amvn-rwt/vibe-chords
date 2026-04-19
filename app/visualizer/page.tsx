@@ -26,7 +26,7 @@ export default function VisualizerPage() {
     const activeNotes = getScaleNotes(selectedRoot, selectedScale);
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="h-full overflow-y-auto scrollbar-theme bg-background text-foreground">
             <main className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-8">
                 {/* Page title */}
                 <div className="space-y-1">

@@ -13,14 +13,11 @@ const NAV_LINKS = [
 
 export default function TopNav() {
     const pathname = usePathname();
-    // usePathname() — a Next.js hook that returns the current URL path.
-    // We use it to highlight which tab is active.
 
     return (
-        <header className="flex items-center justify-between border-b border-border px-4 py-2">
+        <header className="flex items-center justify-between border-b border-border bg-background px-4 py-2">
             <div className="flex items-center gap-6">
                 <VibeChordsLogo className="text-xl" />
-
                 <nav className="flex items-center gap-1">
                     {NAV_LINKS.map(({ href, label }) => (
                         <Link
@@ -38,7 +35,6 @@ export default function TopNav() {
                     ))}
                 </nav>
             </div>
-
             <ThemeToggle />
         </header>
     );

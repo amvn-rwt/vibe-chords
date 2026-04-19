@@ -1,7 +1,7 @@
 "use client";
 
 interface VibeChordsLogoProps {
-  className?: string;
+    className?: string;
 }
 
 /**
@@ -9,12 +9,12 @@ interface VibeChordsLogoProps {
  * Use this anywhere the logo should appear (splash, header, etc.) for consistency.
  */
 export default function VibeChordsLogo({ className }: VibeChordsLogoProps) {
-  return (
-    <span
-      className={`font-brand italic ${className ?? ""}`}
-      style={{ fontFamily: "var(--font-brand), cursive" }}
-    >
-      VibeChords
-    </span>
-  );
+    return (
+        <span
+            className={`font-brand italic text-primary ${className ?? ""}`}
+            style={{ fontFamily: "var(--font-brand), cursive" }}
+        >
+            VibeChords
+        </span>
+    );
 }

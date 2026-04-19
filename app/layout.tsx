@@ -57,8 +57,10 @@ export default async function RootLayout({
             </head>
             <body className="antialiased">
                 <ThemeProvider initialTheme={isDark ? "dark" : "light"}>
-                    <TopNav />
-                    {children}
+                    <div className="flex flex-col h-screen">
+                        <TopNav />
+                        <div className="flex-1 min-h-0">{children}</div>
+                    </div>
                 </ThemeProvider>
             </body>
         </html>

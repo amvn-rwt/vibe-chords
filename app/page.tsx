@@ -137,7 +137,7 @@ export default function Home() {
     }
 
     return (
-        <div className="h-screen overflow-hidden bg-background font-sans text-foreground flex flex-col">
+        <div className="h-full overflow-hidden bg-background font-sans text-foreground flex flex-col">
             <div
                 className={`flex-1 min-h-0 overflow-hidden w-full grid grid-cols-1 ${
                     chordData ? "lg:grid-cols-[1fr_380px]" : ""
