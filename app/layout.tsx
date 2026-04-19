@@ -3,27 +3,28 @@ import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Rochester } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import TopNav from "@/components/TopNav";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 const rochester = Rochester({
-  variable: "--font-rochester",
-  subsets: ["latin"],
-  weight: ["400"],
+    variable: "--font-rochester",
+    subsets: ["latin"],
+    weight: ["400"],
 });
 
 export const metadata: Metadata = {
-  title: "VibeChords — AI Chord Progression Generator",
-  description:
-    "Describe a vibe, get a musically valid chord progression with browser playback and MIDI export.",
+    title: "VibeChords — AI Chord Progression Generator",
+    description:
+        "Describe a vibe, get a musically valid chord progression with browser playback and MIDI export.",
 };
 
 const themeScript = `
@@ -37,28 +38,31 @@ const themeScript = `
 `;
 
 export default async function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const themeCookie = cookieStore.get("theme")?.value;
-  const isDark = themeCookie === "dark" || (!themeCookie && false);
+    const cookieStore = await cookies();
+    const themeCookie = cookieStore.get("theme")?.value;
+    const isDark = themeCookie === "dark" || (!themeCookie && false);
 
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${rochester.variable} ${isDark ? "dark" : ""}`}
-      suppressHydrationWarning
-    >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="antialiased">
-        <ThemeProvider initialTheme={isDark ? "dark" : "light"}>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html
+            lang="en"
+            className={`${geistSans.variable} ${geistMono.variable} ${rochester.variable} ${isDark ? "dark" : ""}`}
+            suppressHydrationWarning
+        >
+            <head>
+                <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+            </head>
+            <body className="antialiased">
+                <ThemeProvider initialTheme={isDark ? "dark" : "light"}>
+                    <div className="flex flex-col h-screen">
+                        <TopNav />
+                        <div className="flex-1 min-h-0">{children}</div>
+                    </div>
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }
