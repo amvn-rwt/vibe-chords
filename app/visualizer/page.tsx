@@ -1,10 +1,14 @@
 "use client";
 
-import { useVisualizerStore } from "@/store/useVisualizerStore";
+// import { useVisualizerStore } from "@/store/useVisualizerStore";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getScaleNotes } from "@/lib/music/theory";
-import { CHROMATIC_SCALE } from "@/lib/music/notes";
+import { CHROMATIC_SCALE, Note } from "@/lib/music/notes";
 import { SCALE_NAMES, ScaleType } from "@/lib/music/scales";
 import GuitarFretboard from "@/components/GuitarFretboard";
+import { Button } from "@/components/ui/button";
+import { Check, Copy, Share } from "lucide-react";
+import { useState } from "react";
 
 // Converts "pentatonic_minor" → "Pentatonic Minor" for display
 function formatScaleName(scale: ScaleType): string {
@@ -15,15 +19,43 @@ function formatScaleName(scale: ScaleType): string {
 }
 
 export default function VisualizerPage() {
-    const selectedRoot = useVisualizerStore((state) => state.selectedRoot);
-    const selectedScale = useVisualizerStore((state) => state.selectedScale);
-    const setSelectedRoot = useVisualizerStore(
-        (state) => state.setSelectedRoot,
-    );
-    const setSelectedScale = useVisualizerStore(
-        (state) => state.setSelectedScale,
-    );
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const selectedRoot = (searchParams.get("root") ?? "C") as Note
+    const selectedScale = (searchParams.get("scale") ?? "major") as ScaleType
+
+    // Update the URL search params with the new root and scale
+    const updateParams = (root: Note, scale: ScaleType) => {
+        const params = new URLSearchParams();
+        params.set("root", root);
+        params.set("scale", scale);
+
+        // Replace the current URL with the new params, without scrolling to the top
+        router.replace(`/visualizer?${params.toString()}`, { scroll: false});
+    }
+
+    const handleRootChange = (root: Note) => {
+        updateParams(root, selectedScale);
+        // keep the current scale
+    }
+
+    const handleScaleChange = (scale: ScaleType) => {
+        updateParams(selectedRoot, scale);
+        // keep the current root
+    }
+
     const activeNotes = getScaleNotes(selectedRoot, selectedScale);
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 2000);
+    }
+
+    const [copied, setCopied] = useState(false);
 
     return (
         <div className="h-full overflow-y-auto scrollbar-theme bg-background text-foreground">
@@ -48,8 +80,8 @@ export default function VisualizerPage() {
                         <select
                             value={selectedRoot}
                             onChange={(e) =>
-                                setSelectedRoot(
-                                    e.target.value as typeof selectedRoot,
+                                handleRootChange(
+                                    e.target.value as Note,
                                 )
                             }
                             className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
@@ -69,7 +101,7 @@ export default function VisualizerPage() {
                         <select
                             value={selectedScale}
                             onChange={(e) =>
-                                setSelectedScale(e.target.value as ScaleType)
+                                handleScaleChange(e.target.value as ScaleType)
                             }
                             className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
                         >
@@ -79,6 +111,18 @@ export default function VisualizerPage() {
                                 </option>
                             ))}
                         </select>
+                    </div>
+                    {/* Share button */}
+                    <div className="flex flex-col gap-1 justify-end">
+                        <Button
+                            onClick={handleCopyLink}
+                            className="border rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors cursor-pointer"
+                            title="Copy link"
+                            variant="outline"
+                            size="icon"
+                        >
+                            {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+                        </Button>
                     </div>
                 </div>
 
