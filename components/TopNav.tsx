@@ -7,7 +7,7 @@ import VibeChordsLogo from "@/components/VibeChordsLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_LINKS = [
-    { href: "/", label: "Chords" },
+    { href: "/chords", label: "Chords" },
     { href: "/visualizer", label: "Theory" },
 ];
 
