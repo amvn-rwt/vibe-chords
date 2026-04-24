@@ -6,6 +6,9 @@ import { getScaleNotes } from "@/lib/music/theory";
 import { CHROMATIC_SCALE, Note } from "@/lib/music/notes";
 import { SCALE_NAMES, ScaleType } from "@/lib/music/scales";
 import GuitarFretboard from "@/components/GuitarFretboard";
+import { Button } from "@/components/ui/button";
+import { Check, Copy, Share } from "lucide-react";
+import { useState } from "react";
 
 // Converts "pentatonic_minor" → "Pentatonic Minor" for display
 function formatScaleName(scale: ScaleType): string {
@@ -43,6 +46,16 @@ export default function VisualizerPage() {
     }
 
     const activeNotes = getScaleNotes(selectedRoot, selectedScale);
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 2000);
+    }
+
+    const [copied, setCopied] = useState(false);
 
     return (
         <div className="h-full overflow-y-auto scrollbar-theme bg-background text-foreground">
@@ -98,6 +111,18 @@ export default function VisualizerPage() {
                                 </option>
                             ))}
                         </select>
+                    </div>
+                    {/* Share button */}
+                    <div className="flex flex-col gap-1 justify-end">
+                        <Button
+                            onClick={handleCopyLink}
+                            className="border rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors cursor-pointer"
+                            title="Copy link"
+                            variant="outline"
+                            size="icon"
+                        >
+                            {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+                        </Button>
                     </div>
                 </div>
 
