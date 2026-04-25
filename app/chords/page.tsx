@@ -193,8 +193,8 @@ export default function Home() {
                                         </p>
                                     )}
 
-                                    <Card className="border-border bg-card flex self-center">
-                                        <CardContent className="flex justify-center gap-3">
+                                    <Card className="border-border bg-card flex self-center max-sm:w-full max-sm:py-0">
+                                        <CardContent className="flex justify-center gap-3 max-sm:block max-sm:p-4">
                                             <ChordPlayer
                                                 chordData={chordData}
                                                 bpm={bpm}
@@ -210,11 +210,13 @@ export default function Home() {
                                                 onChordChange={
                                                     setActiveChordIndex
                                                 }
-                                            />
-                                            <ExportButton
-                                                chordData={chordData}
-                                                bpm={bpm}
-                                                octave={octave}
+                                                actions={
+                                                    <ExportButton
+                                                        chordData={chordData}
+                                                        bpm={bpm}
+                                                        octave={octave}
+                                                    />
+                                                }
                                             />
                                         </CardContent>
                                     </Card>
@@ -288,8 +290,8 @@ export default function Home() {
                     </div>
 
                     {/* Floating input at bottom — width matches content; bar does not cover scrollbar */}
-                    <div className="absolute bottom-0 left-0 right-4 z-10 pl-4 pr-4 pb-4 pt-2 bg-background pointer-events-none">
-                        <div className="pointer-events-auto mx-auto max-w-2xl w-full">
+                    <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-4 pt-2 bg-background pointer-events-none md:right-4">
+                        <div className="pointer-events-auto w-full md:mx-auto md:max-w-2xl">
                             <div className="flex items-center gap-2 rounded-2xl border border-input bg-background px-4 py-2.5 shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent min-w-0">
                                 <input
                                     ref={inputRef}
