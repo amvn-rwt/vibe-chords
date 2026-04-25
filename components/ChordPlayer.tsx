@@ -32,7 +32,7 @@
  *    Otherwise we'd get ghost audio playing in the background.
  */
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, type ReactNode } from "react";
 import { ChordData } from "@/types/chord";
 import { chordToNotes } from "@/lib/chordToNotes";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,8 @@ interface ChordPlayerProps {
   onPlayToggle: () => void;
   /** Called on each beat with the index of the chord now playing */
   onChordChange: (index: number) => void;
+  /** Optional action rendered with the player controls, like MIDI export. */
+  actions?: ReactNode;
 }
 
 const OCTAVE_MIN = 2;
@@ -113,6 +115,7 @@ export default function ChordPlayer({
   isPlaying,
   onPlayToggle,
   onChordChange,
+  actions,
 }: ChordPlayerProps) {
   /**
    * useRef stores mutable values that persist across renders without
@@ -282,23 +285,24 @@ export default function ChordPlayer({
   }, [chordData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
-      <Button
-        onClick={onPlayToggle}
-        variant="default"
-        size="icon"
-        className="rounded-lg"
-        aria-label={isPlaying ? "Pause" : "Play"}
-        title={isPlaying ? "Pause" : "Play"}
-      >
-        {isPlaying ? (
-          <Pause className="size-5" aria-hidden />
-        ) : (
-          <Play className="size-5" aria-hidden />
-        )}
-      </Button>
+    <div className="flex items-center gap-3 flex-wrap max-sm:w-full max-sm:flex-col max-sm:items-stretch">
+      <div className="flex min-w-0 items-center gap-3 max-sm:w-full sm:contents">
+        <Button
+          onClick={onPlayToggle}
+          variant="default"
+          size="icon"
+          className="rounded-lg max-sm:size-10"
+          aria-label={isPlaying ? "Pause" : "Play"}
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? (
+            <Pause className="size-5 max-sm:size-4" aria-hidden />
+          ) : (
+            <Play className="size-5 max-sm:size-4" aria-hidden />
+          )}
+        </Button>
 
-      <div className="flex min-w-80 max-w-80 flex-1 items-center gap-2">
+      <div className="flex min-w-80 max-w-80 flex-1 items-center gap-2 max-sm:min-w-0 max-sm:max-w-none max-sm:flex-1">
         <Label htmlFor="bpm-slider" className="w-8 shrink-0 text-muted-foreground text-xs">
           BPM
         </Label>
@@ -314,34 +318,38 @@ export default function ChordPlayer({
           {bpm}
         </span>
       </div>
-      {onOctaveChange && (
-        <div className="flex items-center gap-2">
-          <Label className="text-muted-foreground shrink-0 text-xs">Octave</Label>
-          <div className="flex items-center rounded-md border border-input bg-muted/30">
-            <button
-              type="button"
-              onClick={() => onOctaveChange(Math.max(OCTAVE_MIN, octave - 1))}
-              disabled={octave <= OCTAVE_MIN}
-              className="inline-flex size-8 items-center justify-center rounded-l-md text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer disabled:pointer-events-none disabled:opacity-50"
-              aria-label="Lower octave"
-            >
-              <ChevronDown className="size-4" />
-            </button>
-            <span className="min-w-8 text-center text-sm font-mono tabular-nums">
-              {octave}
-            </span>
-            <button
-              type="button"
-              onClick={() => onOctaveChange(Math.min(OCTAVE_MAX, octave + 1))}
-              disabled={octave >= OCTAVE_MAX}
-              className="inline-flex size-8 items-center justify-center rounded-r-md text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer disabled:pointer-events-none disabled:opacity-50"
-              aria-label="Raise octave"
-            >
-              <ChevronUp className="size-4" />
-            </button>
+      </div>
+      <div className="contents max-sm:flex max-sm:items-center max-sm:justify-end max-sm:gap-2">
+        {onOctaveChange && (
+          <div className="flex items-center gap-2">
+            <Label className="text-muted-foreground shrink-0 text-xs">Octave</Label>
+            <div className="flex items-center rounded-md border border-input bg-muted/30">
+              <button
+                type="button"
+                onClick={() => onOctaveChange(Math.max(OCTAVE_MIN, octave - 1))}
+                disabled={octave <= OCTAVE_MIN}
+                className="inline-flex size-8 items-center justify-center rounded-l-md text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                aria-label="Lower octave"
+              >
+                <ChevronDown className="size-4" />
+              </button>
+              <span className="min-w-8 text-center text-sm font-mono tabular-nums">
+                {octave}
+              </span>
+              <button
+                type="button"
+                onClick={() => onOctaveChange(Math.min(OCTAVE_MAX, octave + 1))}
+                disabled={octave >= OCTAVE_MAX}
+                className="inline-flex size-8 items-center justify-center rounded-r-md text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                aria-label="Raise octave"
+              >
+                <ChevronUp className="size-4" />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+        {actions}
+      </div>
     </div>
   );
 }
