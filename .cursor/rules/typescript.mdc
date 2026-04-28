@@ -1,0 +1,70 @@
+---
+description: TypeScript standards for vibe-chords — strict types, no any, shared types
+alwaysApply: true
+---
+
+# TypeScript Standards
+
+## No `any`
+
+Never use `any`. If a type is unknown, use `unknown` and narrow it.
+
+```typescript
+// ❌ BAD
+function parseResponse(data: any) { ... }
+
+// ✅ GOOD
+function parseResponse(data: unknown) {
+    if (!isProgression(data)) throw new Error("Unexpected response shape")
+    return data
+}
+```
+
+## No type assertions without justification
+
+`as Foo` silently discards type safety. Only use it when you have verified the shape and cannot express it otherwise. Always leave a comment.
+
+```typescript
+// ❌ BAD
+const chord = raw as ChordData
+
+// ✅ GOOD
+// Response shape is validated by isChordData() above
+const chord = raw as ChordData
+```
+
+## `type` vs `interface`
+
+Use `type` for data shapes and unions. Use `interface` only when you need declaration merging (rare).
+
+```typescript
+// ✅ data shape → type
+type ChordData = {
+    root: string
+    quality: string
+    notes: string[]
+}
+
+// ✅ union → type
+type PlaybackState = "idle" | "playing" | "paused"
+```
+
+## Shared types
+
+All shared types live in `types/chord.ts`. Never re-define a type locally if it already exists there. Import it.
+
+```typescript
+// ❌ BAD — re-defining locally
+type Chord = { root: string; quality: string }
+
+// ✅ GOOD
+import type { ChordData } from "@/types/chord"
+```
+
+## Import types
+
+Use `import type` when importing only type definitions. This is erased at build time and keeps runtime imports clean.
+
+```typescript
+import type { ChordData, Progression } from "@/types/chord"
+```

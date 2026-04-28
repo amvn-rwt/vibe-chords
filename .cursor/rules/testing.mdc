@@ -1,0 +1,46 @@
+---
+description: Testing standards for vibe-chords — when to write tests, where they live, and how to keep them current
+alwaysApply: true
+---
+
+# Testing Standards
+
+Use **Vitest** as the test runner. Test files live next to the code they test with a `.test.ts` or `.test.tsx` suffix.
+
+```
+lib/music/notes.ts         → lib/music/notes.test.ts
+hooks/useChordGenerator.ts → hooks/useChordGenerator.test.ts
+```
+
+## When tests are required
+
+| Layer | Rule |
+|---|---|
+| `lib/music/` | Every exported function gets a test. These are pure functions — no excuses. |
+| `lib/ai/` | Test prompt builders in `prompts.ts`. Mock the fetch in `openrouter.ts`. |
+| `lib/midi/` | Test MIDI export output against known byte sequences. |
+| `hooks/` | Test the happy path and error states. Mock API calls and Tone.js. |
+| `store/` | Test state transitions — what changes when an action is dispatched. |
+| `components/` | Only test non-trivial logic (e.g. playback state, disabled states). Skip snapshot tests. |
+
+## When to update tests
+
+- Changing a function signature → update the test immediately, in the same commit
+- Adding a parameter → add a test case covering the new parameter
+- Fixing a bug → add a regression test that would have caught it
+
+## Test structure
+
+```typescript
+// one describe block per function or component
+describe("parseChordProgression", () => {
+    it("returns chords in order", () => { ... })
+    it("throws on invalid input", () => { ... })
+})
+```
+
+## What not to test
+
+- shadcn primitives in `components/ui/` — never modified, never tested here
+- `app/layout.tsx` and `app/page.tsx` — pure composition, no logic
+- CSS or Tailwind class names

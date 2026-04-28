@@ -1,0 +1,47 @@
+---
+description: Security rules for vibe-chords — API keys, environment variables, server-only code
+alwaysApply: true
+---
+
+# Security Standards
+
+## OpenRouter API key
+
+`OPENROUTER_API_KEY` is a server-only secret. It must never appear in client-side code.
+
+- No `NEXT_PUBLIC_` prefix -- that would expose it to the browser
+- Only read in `app/api/` route handlers or `lib/ai/openrouter.ts` (which is only ever called server-side)
+- Never import `lib/ai/openrouter.ts` from a component or hook
+
+```typescript
+// ❌ BAD — readable by anyone who opens devtools
+const key = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY
+
+// ✅ GOOD — server-only, undefined in the browser
+const key = process.env.OPENROUTER_API_KEY
+```
+
+## All AI calls go through the API route
+
+Components and hooks never call OpenRouter directly. The flow is always:
+
+```
+component → hook → fetch("/api/generate") → app/api/generate/route.ts → OpenRouter
+```
+
+If you find yourself importing `openrouter.ts` into a hook or component, stop and route it through an API handler instead.
+
+## Environment variables
+
+- Never hardcode secrets, keys, or tokens in source code
+- Keep a `.env.local` file locally (already in `.gitignore`)
+- Document required variables in `.env.example` with placeholder values -- commit that file
+
+```bash
+# .env.example
+OPENROUTER_API_KEY=your_key_here
+```
+
+## User input
+
+Any text sent to the AI (the vibe prompt) passes through the API route. Trim and limit its length server-side before forwarding to OpenRouter -- do not trust the client to enforce this.

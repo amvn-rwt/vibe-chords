@@ -1,0 +1,61 @@
+---
+description: Next.js App Router conventions — server vs client components, use client rules
+alwaysApply: true
+---
+
+# Next.js App Router Conventions
+
+## Default to Server Components
+
+Every component is a Server Component unless it needs the browser. Do not add `"use client"` by default.
+
+## When to add `"use client"`
+
+Only add `"use client"` when the component needs one of:
+- Browser APIs (`window`, `document`, `navigator`)
+- Event handlers (`onClick`, `onChange`, `onSubmit`)
+- React hooks (`useState`, `useEffect`, `useRef`, custom hooks)
+- Third-party libs that require the browser (Tone.js, etc.)
+
+```typescript
+// ❌ BAD — use client added without reason
+"use client"
+export function ChordTitle({ title }: { title: string }) {
+    return <h1>{title}</h1>   // no browser APIs, no hooks
+}
+
+// ✅ GOOD — Server Component, no directive needed
+export function ChordTitle({ title }: { title: string }) {
+    return <h1>{title}</h1>
+}
+```
+
+## Push `"use client"` to the leaves
+
+Keep the `"use client"` boundary as deep in the tree as possible. A parent Server Component can render a Client Component child -- not the reverse.
+
+```
+app/chords/page.tsx         ← Server Component (no directive)
+  └── ProgressionPanel      ← Server Component
+        └── ChordPlayer     ← "use client" (needs Tone.js + hooks)
+```
+
+## No `async` in Client Components
+
+`async/await` at the component level only works in Server Components. Data fetching in Client Components goes through hooks.
+
+```typescript
+// ❌ BAD — async Client Component
+"use client"
+export async function ChordInput() { ... }
+
+// ✅ GOOD — hook handles async in client
+"use client"
+export function ChordInput() {
+    const { generate, isLoading } = useChordGenerator()
+}
+```
+
+## Route handlers
+
+API logic lives in `app/api/*/route.ts`. These are always Server-side -- never import them into client code.

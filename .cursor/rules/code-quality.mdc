@@ -1,0 +1,84 @@
+---
+description: Code quality standards for vibe-chords — modularity, naming, comments, and design patterns
+alwaysApply: true
+---
+
+# Code Quality Standards
+
+## Modularity
+
+- One concern per file. A file that does two things should be two files.
+- If a function is longer than ~40 lines, it is doing too much — extract.
+- Shared logic goes in `lib/`. Component-specific logic stays in the component or its hook.
+- No business logic in `page.tsx` files. Pages compose, they do not compute.
+- No API calls in components. That belongs in a hook.
+
+```typescript
+// ❌ BAD — component doing too much
+export function ChordInput() {
+    const [chords, setChords] = useState([])
+    const res = await fetch("/api/generate", { ... })   // API call in component
+    const parsed = res.json().chords.map(c => ...)      // business logic in component
+}
+
+// ✅ GOOD — component delegates
+export function ChordInput() {
+    const { generate, isLoading } = useChordGenerator()
+}
+```
+
+## Naming
+
+- **Variables and functions**: describe what they hold or do, not how they do it
+- **Booleans**: prefix with `is`, `has`, `can`, `should` — `isLoading`, `hasError`, `canExport`
+- **Event handlers**: prefix with `handle` — `handlePlay`, `handleSubmit`
+- **Arrays**: plural nouns — `chords`, `progressions`, `notes`
+- **No abbreviations** unless they are universally understood (`bpm`, `midi`, `id`)
+
+```typescript
+// ❌ BAD
+const d = await fetchData()
+const arr = chords.filter(c => c.v > 0)
+const fn = () => setPlaying(true)
+
+// ✅ GOOD
+const progression = await generateProgression()
+const audibleChords = chords.filter(chord => chord.velocity > 0)
+const handlePlay = () => setIsPlaying(true)
+```
+
+## Comments
+
+Write comments to explain **why**, not **what**. If you need a comment to explain what the code does, the code should be rewritten.
+
+```typescript
+// ❌ BAD — describes what the code does (already obvious)
+// loop through chords and return the ones in the key
+const chordsInKey = chords.filter(chord => key.includes(chord.root))
+
+// ✅ GOOD — explains a non-obvious constraint or decision
+// Tone.js requires AudioContext to be resumed after a user gesture on iOS
+await Tone.start()
+```
+
+- Use a comment for: non-obvious constraints, browser quirks, intentional workarounds, links to specs
+- Do not comment every function — only ones with non-obvious behavior
+- No `// TODO` without a reason: write `// TODO: handle suspended chords once AI prompt supports them`
+
+## Design patterns
+
+- **Single responsibility**: each function/component does one thing well
+- **Separation of concerns**: UI in components, logic in hooks, data in store, pure functions in lib
+- **Composition over inheritance**: build complex components from small primitives
+- **Explicit over implicit**: pass props and arguments explicitly, avoid magic globals
+
+## File length
+
+| Type | Soft limit |
+|---|---|
+| `lib/` pure function files | 80 lines |
+| Hook files | 100 lines |
+| Component files | 120 lines |
+| Store | 80 lines |
+
+Exceeding these is a signal to split, not a hard error.
